@@ -1732,3 +1732,5 @@ gets wet.  (CC)
 When she stops, the car is facing east.  (_Math for Girls_)
 
 2.34 answer:  She drove the car backward.
+
+end
