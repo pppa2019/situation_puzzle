@@ -1,8 +1,28 @@
 {
+    "1.47": {
+        "senario": [
+            "A body is discovered in a park in Chicago in the middle of summer. It has a fractured skull and many other broken bones, but the cause of death was hypothermia.  ",
+            "A man is lying drowned in a dead forest."
+        ],
+        "answer": [
+            "A poor peasant from somewhere in Europe wants desperately to get to the U.S.  Not having money for airfare, he stows away in the landing gear compartment of a jet.  He dies of hypothermia in mid-flight, and falls out when the landing gear compartment opens as the plane makes its final approach.  This apparently happened in real life as well; Mark Brader provided an AP item from Paris, printed in the _Toronto Star_ on 7/10/93, about just such an occurrence.",
+            "He's scuba diving when a firefighting plane lands nearby and fills its tanks with water, sucking him in with the water.  He runs out of air while the plane is in flight; the plane then dumps its load of water, with him in it, onto a burning forest.  "
+        ],
+        "question": "How could this be?"
+    },
+    "1.6": {
+        "senario": [
+            "A man walks into a bar and asks for a drink.  The bartender pulls out a gun and points it at him.  The man says, \"Thank you,\" and walks out. "
+        ],
+        "answer": [
+            "The man has hiccups; the bartender scares them away by pulling a gun."
+        ],
+        "question": "How could this be?"
+    },
     "1.1": {
         "senario": [
-            "A man goes into a restaurant, orders abalone, eats one bite, and kills himself.  ",
-            "same problem statement but with albatross instead of abalone.",
+            "A man goes into a restaurant, orders abalone, eats one bite, and kills himself.",
+            "A man goes into a restaurant, orders albatross, eats one bite, and kills himself.",
             "A man kills himself rather than order albatross."
         ],
         "answer": [
@@ -47,15 +67,6 @@
         ],
         "answer": [
             "The drinks contain poisoned ice cubes; one man drinks slowly, giving them time to melt, while the other drinks quickly and thus doesn't get much of the poison.  The fact that they drink at different speeds could be added to the statement, possibly along with red herrings such as saying that one of the men is big and burly and the other short and thin."
-        ],
-        "question": "How could this be?"
-    },
-    "1.6": {
-        "senario": [
-            "A man walks into a bar and asks for a drink.  The bartender pulls out a gun and points it at him.  The man says, \"Thank you,\" and walks out. "
-        ],
-        "answer": [
-            "The man has hiccups; the bartender scares them away by pulling a gun."
         ],
         "question": "How could this be?"
     },
@@ -440,17 +451,6 @@
         "answer": [
             "His home is a houseboat and he has run out of water while on an extended cruise.",
             "Same."
-        ],
-        "question": "How could this be?"
-    },
-    "1.47": {
-        "senario": [
-            "A body is discovered in a park in Chicago in the middle of summer. It has a fractured skull and many other broken bones, but the cause of death was hypothermia.  ",
-            "A man is lying drowned in a dead forest."
-        ],
-        "answer": [
-            "A poor peasant from somewhere in Europe wants desperately to get to the U.S.  Not having money for airfare, he stows away in the landing gear compartment of a jet.  He dies of hypothermia in mid-flight, and falls out when the landing gear compartment opens as the plane makes its final approach.  This apparently happened in real life as well; Mark Brader provided an AP item from Paris, printed in the _Toronto Star_ on 7/10/93, about just such an occurrence.",
-            "He's scuba diving when a firefighting plane lands nearby and fills its tanks with water, sucking him in with the water.  He runs out of air while the plane is in flight; the plane then dumps its load of water, with him in it, onto a burning forest.  "
         ],
         "question": "How could this be?"
     },
