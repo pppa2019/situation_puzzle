@@ -1,2 +1,2 @@
-export OPENAI_API_KEY=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
+export OPENAI_API_KEY=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
 python openai_infer.py

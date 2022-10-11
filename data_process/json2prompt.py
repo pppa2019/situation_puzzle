@@ -1,5 +1,7 @@
 import json
-
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--sample_num", type=int, default=3)
 with open('puzzles.json', 'r') as f:
     dataset = json.load(f)
 task_definition = "I am a chatbot that can answer questions from users."
