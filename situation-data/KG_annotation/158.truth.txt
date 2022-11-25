@@ -1,0 +1,1 @@
+a chess game; knight takes pawn
