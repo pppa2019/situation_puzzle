@@ -108,7 +108,7 @@ def convert_AMR2EventGraph(instance_dict, relation_triples, raw_sent, begin_idx,
         [span_type[2], "EventCause", span_type[2]], # cause, argw w
         [span_type[2], "EventTemporal", span_type[2]], # and op op time after
         [span_type[2], "EventEqual", span_type[2]], # and op op
-        [span_type[2], "Event_att", span_type[0]], # ARG2
+        [span_type[1], "Event_att", span_type[2]], # ARG2
     ]
     amr_converter = {
         ':ARG0': relationship_type[1],
@@ -176,7 +176,7 @@ def convert_AMR2EventGraph(instance_dict, relation_triples, raw_sent, begin_idx,
                 span_dict[f'T{len(span_dict)+1}'] = [span_type1, str(span1_start+begin_idx), str(span1_end+begin_idx), instance1]
                 instance2spanid[instance1] =  f'T{len(span_dict)}'
             # event triples contain event and event's relationships
-            if span_dict[instance2spanid[instance0]][0]==span_type[2] and span_dict[instance2spanid[instance1]][0]!=span_type[2]:
+            if span_dict[instance2spanid[instance0]][0]==span_type[2] and span_dict[instance2spanid[instance1]][0]!=span_type[2] and ('att' not in schema[1]):
                 event = instance0
                 # import ipdb;ipdb.set_trace()
                 if event not in instance2eventid:
@@ -194,54 +194,93 @@ def convert_AMR2EventGraph(instance_dict, relation_triples, raw_sent, begin_idx,
             # attribuite recognization
             # TODO: remove replicated triples
             if 'att' in schema[1]:
+                # import ipdb;ipdb.set_trace()
+                if span_dict[instance2spanid[instance0]][0]==span_type[2]:
+                    schema[1] = 'Event_att'
+                    # import ipdb;ipdb.set_trace()
                 relation_dict[f"R{len(relation_dict)+1}"] = [schema[1], f'Arg1:{instance2spanid[instance1]}', f'Arg2:{instance2spanid[instance0]}']
 
     return span_dict, relation_dict, event_dict
 
+def convert_sent2EventGraph(text):
+    doc = nlp(text)
+    graphs, sent_triples = doc._.to_amr()
+    begin_idx = 0
+    relation_dict = {}
+    span_dict = {}
+    event_dict = {}
+    sents = []
+    for sent, graph, triples in zip(doc.sents, graphs, sent_triples):
+        sent = sent.text
+        sent = sent.replace('.', '')
+        sent = sent.replace(',', ' ')
+        sent = sent.replace('?', ' ')
+        sent = sent.lower()
+        sents.append(sent)
+        print(graph)
+        relation_triples = []
+        instance_dict = {}
+        for item in triples:
+            if item[1]==':instance':
+                instance_dict[item[0]] = item[2].split('-')[0]
+            else:
+                relation_triples.append(item)
+        # try:
+        #     triples2graph(instance_dict, relation_triples, f'/data/chenyijie/software/brat/data/amr_test_ann/{prefix}.jpg')
+        # except:
+        #     pass
+        span_dict, relation_dict, event_dict = convert_AMR2EventGraph(instance_dict, relation_triples, sent, begin_idx, span_dict, event_dict, relation_dict)
+        begin_idx += len(sent)+2
+    return span_dict, relation_dict, event_dict
+
+
 if __name__=='__main__':
-    input_path = 'assign_annotation/A_folder'
-    output_path = 'assign_annotation/A_auto_annotate'
-    examples = load_files(path=input_path)
-    for prefix, example in examples.items():
-        example = example.strip()
-        doc = nlp(example)
-        graphs, sent_triples = doc._.to_amr()
-        begin_idx = 0
-        relation_dict = {}
-        span_dict = {}
-        event_dict = {}
-        sents = []
-        for sent, graph, triples in zip(doc.sents, graphs, sent_triples):
-            sent = sent.text
-            sent = sent.replace('.', '')
-            sent = sent.replace(',', ' ')
-            sent = sent.replace('?', ' ')
-            sent = sent.lower()
-            sents.append(sent)
-            print(graph)
-            relation_triples = []
-            instance_dict = {}
-            for item in triples:
-                if item[1]==':instance':
-                    instance_dict[item[0]] = item[2].split('-')[0]
-                else:
-                    relation_triples.append(item)
-            try:
-                triples2graph(instance_dict, relation_triples, f'/data/chenyijie/software/brat/data/amr_test_ann/{prefix}.jpg')
-            except:
-                pass
-            span_dict, relation_dict, event_dict = convert_AMR2EventGraph(instance_dict, relation_triples, sent, begin_idx, span_dict, event_dict, relation_dict)
-            begin_idx += len(sent)+2
-            print(span_dict)
-            print(relation_dict)
-            print(event_dict)
-            print('\n' + '*-'*50+'\n')
-        with open(os.path.join(output_path, f'{prefix}.txt'), 'w') as f:
-            f.write('. '.join(sents)+'\n')
-        with open(os.path.join(output_path, f'{prefix}.ann'), 'w') as f:
-            for key, value in span_dict.items():
-                f.write(key+'\t'+' '.join(value[:-1])+'\t'+value[-1]+'\n')
-            for key, value in event_dict.items():
-                f.write(key+'\t'+' '.join(value)+'\n')
-            for key, value in relation_dict.items():
-                f.write(key+'\t'+' '.join(value)+'\n')
+    convert_sent2EventGraph('I am an example for testing function.')
+
+    # input_path = 'assign_annotation/A_folder'
+    # output_path = 'assign_annotation/A_auto_annotate'
+    # examples = load_files(path=input_path)
+    # for prefix, example in examples.items():
+    #     example = example.strip()
+    #     doc = nlp(example)
+    #     import ipdb;ipdb.set_trace()
+    #     graphs, sent_triples = doc._.to_amr()
+    #     begin_idx = 0
+    #     relation_dict = {}
+    #     span_dict = {}
+    #     event_dict = {}
+    #     sents = []
+    #     for sent, graph, triples in zip(doc.sents, graphs, sent_triples):
+    #         sent = sent.text
+    #         sent = sent.replace('.', '')
+    #         sent = sent.replace(',', ' ')
+    #         sent = sent.replace('?', ' ')
+    #         sent = sent.lower()
+    #         sents.append(sent)
+    #         print(graph)
+    #         relation_triples = []
+    #         instance_dict = {}
+    #         for item in triples:
+    #             if item[1]==':instance':
+    #                 instance_dict[item[0]] = item[2].split('-')[0]
+    #             else:
+    #                 relation_triples.append(item)
+    #         try:
+    #             triples2graph(instance_dict, relation_triples, f'/data/chenyijie/software/brat/data/amr_test_ann/{prefix}.jpg')
+    #         except:
+    #             pass
+    #         span_dict, relation_dict, event_dict = convert_AMR2EventGraph(instance_dict, relation_triples, sent, begin_idx, span_dict, event_dict, relation_dict)
+    #         begin_idx += len(sent)+2
+    #         print(span_dict)
+    #         print(relation_dict)
+    #         print(event_dict)
+    #         print('\n' + '*-'*50+'\n')
+    #     with open(os.path.join(output_path, f'{prefix}.txt'), 'w') as f:
+    #         f.write('. '.join(sents)+'\n')
+    #     with open(os.path.join(output_path, f'{prefix}.ann'), 'w') as f:
+    #         for key, value in span_dict.items():
+    #             f.write(key+'\t'+' '.join(value[:-1])+'\t'+value[-1]+'\n')
+    #         for key, value in event_dict.items():
+    #             f.write(key+'\t'+' '.join(value)+'\n')
+    #         for key, value in relation_dict.items():
+    #             f.write(key+'\t'+' '.join(value)+'\n')
