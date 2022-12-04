@@ -11,3 +11,8 @@ T7	Event 91 111	rushed for the exits
 E4	Event:T7 Head:T6
 R1	EventEqual Arg1:E4 Arg2:E3	
 R2	EventCause Arg1:E2 Arg2:E3	
+T8	Event 123 130	escaped
+E5	Event:T8 Head:T9
+T9	Head_End 113 115	He
+T10	Att_span 131 147	in the confusion
+R3	Event_att Arg1:T10 Arg2:E5	

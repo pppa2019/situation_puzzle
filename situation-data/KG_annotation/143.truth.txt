@@ -1,1 +1,1 @@
-alice is a goldfish; ted is a cat. 
+Alice is a goldfish; Ted is a cat.

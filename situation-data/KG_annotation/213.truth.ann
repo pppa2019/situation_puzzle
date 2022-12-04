@@ -16,3 +16,7 @@ T9	Event 100 110	experience
 E4	Event:T9 
 R4	NC2Event Arg1:E3 Arg2:E4	
 R5	EventEqual Arg1:E4 Arg2:E2	
+T10	Event 119 127	relieved
+E5	Event:T10 Head:T11
+T11	Head_End 112 114	He
+R6	EntityEqual Arg1:T11 Arg2:T3	

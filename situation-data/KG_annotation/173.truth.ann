@@ -9,3 +9,5 @@ T5	Head_End 88 91	man
 T6	Event 119 122	ran
 E1	Event:T6 Head:T5 End:T7
 T7	Head_End 123 137	19.475 km/hour
+T8	Head_End 148 167	a pretty good speed
+R4	EntityEqual Arg1:T8 Arg2:T7	
