@@ -33,16 +33,9 @@ if __name__=="__main__":
 
 	model_func_dict = {
 		"GPT-3-davinci-003": get_response_from_GPT3,
-		"t5-small": get_response_from_t5,
-		"t5-base": get_response_from_t5,
-		"t5-large": get_response_from_t5,
-		"Blender": get_response_from_Blender,
-		"GPT-2": get_response_from_gpt2_large
 	}
 	get_response = model_func_dict[args.model]
 	dataset = load_data("situation-data/lateral_data.json")
-	# check cache and reload
-	# import ipdb;ipdb.set_trace()
 	output_caches = os.listdir('output')
 	reload_filename = ''
 	max_sample_num = 0
@@ -59,10 +52,8 @@ if __name__=="__main__":
 		dataset[:begin_len] = cache_data
 	else:
 		begin_len = 0
-	# dataset = list(dataset.values())
 	with_hint = args.with_hint
-	if args.model=="GPT-3" or args.model=='GPT-3-davinci-003' and not args.without_QA and not args.golden_QA:
-		valid_answer = ["Yes", 'No', 'Irrelevant', "Yes.", 'No.', 'Irrelevant.']
+	if args.model=="GPT-3" or args.model=='GPT-3-davinci-003' and not args.without_QA:
 		if reload_filename == '':
 			request_logs = []
 		else:
@@ -70,77 +61,34 @@ if __name__=="__main__":
 		for index, item in zip(range(begin_len, begin_len+args.sample_num), dataset[begin_len:begin_len+args.sample_num]):
 			turn_count = 0
 			log_item = {
-				'gen_question_list': [],
-				'gen_question_logs':[],
 				'gen_answer_list': [],
 				'gen_answer_logs':[],
-				'solution_history': [],
-				'solution_his_logs': []
 			}
-			while turn_count < args.max_turn:
-				if 'gen_question_list' in item and len(item['gen_question_list'])>1:
-					qa_pairs = [(q, a) for q, a in zip(item['gen_question_list'], item['gen_answer_list'])]
-					# import ipdb;ipdb.set_trace()
-					shuffle(qa_pairs)
-					item['gen_question_list'] = [q for q, a in qa_pairs]
-					item['gen_answer_list'] = [a for q, a in qa_pairs]
-				question_generation_prompt = convert_to_question_generation_prefix(item)
-				generated_question, gen_ques_log = get_response(question_generation_prompt)
-				
-				if 'gen_question_list' not in item:
-					item["gen_question_list"] = [generated_question]
-					log_item['gen_question_list'] = [generated_question]
-					log_item['gen_question_logs'] = [gen_ques_log]
-				else:
-					item['gen_question_list'].append(generated_question)
-					log_item['gen_question_list'].append(generated_question)
-					log_item['gen_question_logs'].append(gen_ques_log)
-
-				answer_generation_prompt = convert_to_answer_generation_prefix(item)
-				if not args.KGQA:
-					generated_answer, gen_ans_log = get_response(answer_generation_prompt)
-					if generated_answer in valid_answer:
-						if 'gen_answer_list' not in item:
-							item["gen_answer_list"] = [generated_answer]
-							log_item['gen_answer_list'] = [generated_answer]
-							log_item['gen_answer_logs'] = [gen_ans_log]
-						else:
-							item["gen_answer_list"].append(generated_answer)
-							log_item['gen_answer_list'].append(generated_answer)
-							log_item['gen_answer_logs'].append(gen_ans_log)
-					else:
-						item['gen_question_list'].pop(-1)
-						log_item['gen_question_list'].pop(-1)
-						log_item['gen_question_logs'].pop(-1)
-						continue
-				else:
-					path_template = 'situation-data/KG_annotation/{}.ann'
-					generated_answer = get_response_from_KG(
-						path_template.format(f'{index+1}.puzzle'),
-						path_template.format(f'{index+1}.truth'),
-						item["gen_question_list"][-1]
+			if len(item['question_list'])==0:
+				continue
+			else:
+				for i in range(len(item['question_list'])):
+					question_list = item['question_list'][:i+1]
+					answer_list = item['answer_list'][:i]
+					answer_prefix = convert_to_answer_prefix(item, question_list, answer_list)
+					print(answer_prefix)
+					if args.KGQA:
+						# import ipdb;ipdb.set_trace()
+						path_template = 'situation-data/KG_annotation/{}.ann'
+						answer = get_response_from_KG(
+							path_template.format(f'{index+1}.puzzle'),
+							path_template.format(f'{index+1}.truth'),
+							item["question_list"][i]
 						)
-					if 'gen_answer_list' not in item:
-						item["gen_answer_list"] = [generated_answer]
+					answer, log = get_response(answer_prefix)
+					if 'golden_q_answer_list' not in item:
+						item['golden_q_answer_list'] = [answer]
 					else:
-						item["gen_answer_list"].append(generated_answer)
-				
-				solution_generation_prompt = convert_to_solution_generation_prefix(item, with_hint)
-				generated_solution, gen_solution_log = get_response(solution_generation_prompt)
-				print(f"turn_{turn_count+1}: ", generated_solution)
-				if 'solution_history' not in item:
-					item["solution_history"] = [generated_solution]
-					log_item['solution_his_logs'] = [gen_solution_log]
-					log_item['solution_history'] = [generated_solution]
-				else:
-					item["solution_history"].append(generated_solution)
-					log_item['solution_history'].append(generated_solution)
-					log_item['solution_his_logs'].append(gen_solution_log)
-				jaccard_score = Jaccard_similarity(generated_solution, item['final_answer'][0])
-				request_logs.append(log_item)
-				if jaccard_score>args.threshold:
-					break
-				turn_count += 1
+						item['golden_q_answer_list' ].append(answer)
+					if not args.KGQA:
+						request_logs.append(log)
+		with open(f'output/infer_output_s{args.sample_num+begin_len}_{args.model}_t{args.max_turn}.json', 'w') as f:
+			json.dump(request_logs, f)
 		with open(f'output/infer_log_s{args.sample_num+begin_len}_{args.model}_t{args.max_turn}.json', 'w') as f:
 			json.dump(request_logs, f)
 	else:
